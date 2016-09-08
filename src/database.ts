@@ -1,5 +1,6 @@
-import * as Mongoose from "mongoose";
-import * as Mockgoose from "mockgoose";
+//import * as Mongoose from "mongoose";
+import Mongoose = require('mongoose');
+import Mockgoose = require("mockgoose");
 import { IDataConfiguration } from "./configurations";
 import { IUser, UserModel } from "./users/user";
 import { ITask, TaskModel } from "./tasks/task";

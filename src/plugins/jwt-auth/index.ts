@@ -37,7 +37,7 @@ export default (): IPlugin => {
         info: () => {
             return {
                 name: "JWT Authentication",
-                version: "1.0.0"
+                version: "7.1.3"
             };
         }
     };
