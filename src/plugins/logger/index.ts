@@ -5,12 +5,19 @@ export default (): IPlugin => {
     return {
         register: (server: Hapi.Server) => {
             const opts = {
-                opsInterval: 1000,
-                reporters: [{
-                    reporter: require('good-console'),
-                    events: { error: '*', log: '*', response: '*', request: '*' }
-                }]
-            };
+              ops: {
+                interval: 1000
+              },
+              reporters: {
+                myConsoleReporter: [{
+                  module: 'good-squeeze',
+                  name: 'Squeeze',
+                  args: [{error: '*', log: '*', response: '*', request: '*'}]
+                }, {
+                  module: 'good-console'
+                }, 'stdout']
+
+              }};
 
             server.register({
                 register: require('good'),
@@ -24,7 +31,7 @@ export default (): IPlugin => {
         info: () => {
             return {
                 name: "Good Logger",
-                version: "1.0.0"
+                version: "7.0.2"
             };
         }
     };

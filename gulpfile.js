@@ -6,12 +6,15 @@ const tslint = require('gulp-tslint');
 const mocha = require('gulp-mocha');
 const shell = require('gulp-shell');
 const env = require('gulp-env');
+const conf = {
+  outDir :'build'
+};
 
 /**
  * Remove build directory.
  */
 gulp.task('clean', function () {
-  return gulp.src(outDir, { read: false })
+  return gulp.src(conf.outDir, { read: false })
     .pipe(rimraf());
 });
 
