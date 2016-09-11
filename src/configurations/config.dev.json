@@ -7,7 +7,7 @@
     "jwtSecret": "random-secret-password",
     "jwtExpiration": "1h",
     "apiKeys":{
-      "apiKeys": {"abc":"124"},
+      "apiKeys": [{"abc":"124"},{"dev":"125"}],
       "queryKey": "token",
       "headerKey": "zincode-api-key"
     },
