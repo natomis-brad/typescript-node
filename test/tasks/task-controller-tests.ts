@@ -27,11 +27,11 @@ describe("TastController Tests", () => {
     it("Get tasks", (done) => {
         var user = Utils.createUserDummy();
 
-        server.inject({ method: 'POST', url: '/users/login', payload: { email: user.email, password: user.password } }, (res) => {
+        server.inject({ method: 'POST', url: '/users/login', headers:{"zincode-api-key": "abc"}, payload: { email: user.email, password: user.password } }, (res) => {
             assert.equal(200, res.statusCode);
             var login: any = JSON.parse(res.payload);
 
-            server.inject({ method: 'Get', url: '/tasks', headers: { "authorization": login.token } }, (res) => {
+            server.inject({ method: 'Get', url: '/tasks', headers: { "authorization": login.token,"zincode-api-key": "abc" } }, (res) => {
                 assert.equal(200, res.statusCode);
                 var responseBody: Array<ITask> = JSON.parse(res.payload);
                 assert.equal(3, responseBody.length);
@@ -43,12 +43,12 @@ describe("TastController Tests", () => {
     it("Get single task", (done) => {
         var user = Utils.createUserDummy();
 
-        server.inject({ method: 'POST', url: '/users/login', payload: { email: user.email, password: user.password } }, (res) => {
+        server.inject({ method: 'POST', url: '/users/login', headers:{"zincode-api-key": "abc"}, payload: { email: user.email, password: user.password } }, (res) => {
             assert.equal(200, res.statusCode);
             var login: any = JSON.parse(res.payload);
 
             database.taskModel.findOne({}).then((task) => {
-                server.inject({ method: 'Get', url: '/tasks/' + task._id, headers: { "authorization": login.token } }, (res) => {
+                server.inject({ method: 'Get', url: '/tasks/' + task._id, headers: { "authorization": login.token,"zincode-api-key": "abc" } }, (res) => {
                     assert.equal(200, res.statusCode);
                     var responseBody: ITask = JSON.parse(res.payload);
                     assert.equal(task.name, responseBody.name);
@@ -61,14 +61,14 @@ describe("TastController Tests", () => {
     it("Create task", (done) => {
         var user = Utils.createUserDummy();
 
-        server.inject({ method: 'POST', url: '/users/login', payload: { email: user.email, password: user.password } }, (res) => {
+        server.inject({ method: 'POST', url: '/users/login', headers:{"zincode-api-key": "abc"}, payload: { email: user.email, password: user.password } }, (res) => {
             assert.equal(200, res.statusCode);
             var login: any = JSON.parse(res.payload);
 
             database.userModel.findOne({ email: user.email }).then((user: IUser) => {
                 var task = Utils.createTaskDummy();
 
-                server.inject({ method: 'POST', url: '/tasks', payload: task, headers: { "authorization": login.token } }, (res) => {
+                server.inject({ method: 'POST', url: '/tasks', payload: task, headers: { "authorization": login.token,"zincode-api-key": "abc" } }, (res) => {
                     assert.equal(201, res.statusCode);
                     var responseBody: ITask = <ITask>JSON.parse(res.payload);
                     assert.equal(task.name, responseBody.name);
@@ -82,7 +82,7 @@ describe("TastController Tests", () => {
     it("Update task", (done) => {
         var user = Utils.createUserDummy();
 
-        server.inject({ method: 'POST', url: '/users/login', payload: { email: user.email, password: user.password } }, (res) => {
+        server.inject({ method: 'POST', url: '/users/login', headers:{"zincode-api-key": "abc"}, payload: { email: user.email, password: user.password } }, (res) => {
             assert.equal(200, res.statusCode);
             var login: any = JSON.parse(res.payload);
 
@@ -94,7 +94,7 @@ describe("TastController Tests", () => {
                     description: task.description
                 };
 
-                server.inject({ method: 'PUT', url: '/tasks/' + task._id, payload: updateTask, headers: { "authorization": login.token } },
+                server.inject({ method: 'PUT', url: '/tasks/' + task._id, payload: updateTask, headers: { "authorization": login.token,"zincode-api-key": "abc" } },
                     (res) => {
                         assert.equal(200, res.statusCode);
                         console.log(res.payload);
@@ -109,12 +109,12 @@ describe("TastController Tests", () => {
     it("Delete single task", (done) => {
         var user = Utils.createUserDummy();
 
-        server.inject({ method: 'POST', url: '/users/login', payload: { email: user.email, password: user.password } }, (res) => {
+        server.inject({ method: 'POST', url: '/users/login', headers:{"zincode-api-key": "abc"}, payload: { email: user.email, password: user.password } }, (res) => {
             assert.equal(200, res.statusCode);
             var login: any = JSON.parse(res.payload);
 
             database.taskModel.findOne({}).then((task) => {
-                server.inject({ method: 'DELETE', url: '/tasks/' + task._id, headers: { "authorization": login.token } }, (res) => {
+                server.inject({ method: 'DELETE', url: '/tasks/' + task._id, headers: { "authorization": login.token,"zincode-api-key": "abc" } }, (res) => {
                     assert.equal(200, res.statusCode);
                     var responseBody: ITask = JSON.parse(res.payload);
                     assert.equal(task.name, responseBody.name);

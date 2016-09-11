@@ -1,15 +1,21 @@
 {
-    "database": {
-        "connectionString": "mongodb://localhost/taskdb-dev"
+  "database": {
+    "connectionString": "mongodb://localhost/taskdb-dev"
+  },
+  "server": {
+    "port": 5000,
+    "jwtSecret": "random-secret-password",
+    "jwtExpiration": "1h",
+    "apiKeys":{
+      "apiKeys": {"abc":"124"},
+      "queryKey": "token",
+      "headerKey": "zincode-api-key"
     },
-    "server": {
-        "port": 5000,
-        "jwtSecret": "random-secret-password",
-        "jwtExpiration": "1h",
-        "plugins": [
-            "logger",
-            "swagger",
-            "jwt-auth"
-        ]
-    }
+    "plugins": [
+      "logger",
+      "swagger",
+      "jwt-auth",
+      "api-key"
+    ]
+  }
 }
