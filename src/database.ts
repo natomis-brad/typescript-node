@@ -4,12 +4,14 @@ import Mockgoose = require("mockgoose");
 import { IDataConfiguration } from "./configurations";
 import { IUser, UserModel } from "./users/user";
 import { ITask, TaskModel } from "./tasks/task";
+import {IMarkup, MarkupModel} from "./markups/markup";
 
 Mongoose.Promise = global.Promise;
 
 export interface IDatabase {
     userModel: Mongoose.Model<IUser>;
     taskModel: Mongoose.Model<ITask>;
+  markupModel: Mongoose.Model<IMarkup>;
 }
 
 export function init(config: IDataConfiguration): IDatabase {
@@ -28,6 +30,7 @@ export function init(config: IDataConfiguration): IDatabase {
 
     return {
         taskModel: TaskModel,
-        userModel: UserModel
+        userModel: UserModel,
+        markupModel: MarkupModel
     };
 }

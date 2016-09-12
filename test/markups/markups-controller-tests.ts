@@ -1,7 +1,7 @@
 /// <reference path="../../typings.d.ts" />
 import * as chai from "chai";
-import TaskController from "../../src/tasks/task-controller";
-import {ITask} from "../../src/tasks/task";
+import MarkupController from "../../src/markups/markup-controller";
+import {IMarkup} from "../../src/markups/markup";
 import {IUser} from "../../src/users/user";
 import * as Configs from "../../src/configurations";
 import * as Server from "../../src/server";
@@ -14,17 +14,17 @@ const assert = chai.assert;
 const serverConfig = Configs.getServerConfigs();
 const server = Server.init(serverConfig, database);
 
-describe("Tast Controller Tests", () => {
+describe("Markup Controller Tests", () => {
 
   beforeEach((done) => {
-    Utils.createSeedTaskData(database, done);
+    Utils.createSeedMarkupData(database, done);
   });
 
   afterEach((done) => {
     Utils.clearDatabase(database, done);
   });
 
-  it("Get tasks", (done) => {
+  it("Get Markups", (done) => {
     var user = Utils.createUserDummy();
 
     server.inject({
@@ -38,18 +38,18 @@ describe("Tast Controller Tests", () => {
 
       server.inject({
         method: 'Get',
-        url: '/tasks',
+        url: '/markups',
         headers: {"authorization": login.token, "zincode-api-key": "abc"}
       }, (res) => {
         assert.equal(200, res.statusCode);
-        var responseBody: Array<ITask> = JSON.parse(res.payload);
+        var responseBody: Array<IMarkup> = JSON.parse(res.payload);
         assert.equal(3, responseBody.length);
         done();
       });
     });
   });
 
-  it("Get single task", (done) => {
+  it("Get single markup", (done) => {
     var user = Utils.createUserDummy();
 
     server.inject({
@@ -61,22 +61,23 @@ describe("Tast Controller Tests", () => {
       assert.equal(200, res.statusCode);
       var login: any = JSON.parse(res.payload);
 
-      database.taskModel.findOne({}).then((task) => {
+      database.markupModel.findOne({}).then((markup) => {
         server.inject({
           method: 'Get',
-          url: '/tasks/' + task._id,
+          url: '/markups/' + markup._id,
           headers: {"authorization": login.token, "zincode-api-key": "abc"}
         }, (res) => {
           assert.equal(200, res.statusCode);
-          var responseBody: ITask = JSON.parse(res.payload);
-          assert.equal(task.name, responseBody.name);
+          var responseBody: IMarkup = JSON.parse(res.payload);
+          assert.equal(markup.name, responseBody.name);
           done();
         });
       });
     });
   });
 
-  it("Create task", (done) => {
+  it("Get unauth single markup", (done) => {
+    /*
     var user = Utils.createUserDummy();
 
     server.inject({
@@ -87,27 +88,61 @@ describe("Tast Controller Tests", () => {
     }, (res) => {
       assert.equal(200, res.statusCode);
       var login: any = JSON.parse(res.payload);
+*/
+      database.markupModel.findOne({}).then((markup) => {
+        server.inject({
+          method: 'Get',
+          url: '/markups/' + markup._id,
+          headers: {"zincode-api-key": "abc"}
+        }, (res) => {
+          assert.equal(200, res.statusCode);
+          var responseBody: IMarkup = JSON.parse(res.payload);
+          assert.equal(markup.name, responseBody.name);
+          done();
+        });
+      });
 
+  });
+
+  it("Create Markup", (done) => {
+    var user = Utils.createUserDummy();
+
+    server.inject({
+      method: 'POST',
+      url: '/users/login',
+      headers: {"zincode-api-key": "abc"},
+      payload: {email: user.email, password: user.password}
+    }, (res) => {
+      assert.equal(200, res.statusCode);
+      var login: any = JSON.parse(res.payload);
+      var apiKey = res.request.headers["zincode-api-key"];
       database.userModel.findOne({email: user.email}).then((user: IUser) => {
-        var task = Utils.createTaskDummy();
+
+        var markup ={
+          content: "<div>What Content?</div>",
+            name: "New Content",
+          postUrl: "http://SomeCoolUrl.com"
+        };
 
         server.inject({
           method: 'POST',
-          url: '/tasks',
-          payload: task,
+          url: '/markups',
+          payload:markup,
           headers: {"authorization": login.token, "zincode-api-key": "abc"}
         }, (res) => {
           assert.equal(201, res.statusCode);
-          var responseBody: ITask = <ITask>JSON.parse(res.payload);
-          assert.equal(task.name, responseBody.name);
-          assert.equal(task.description, responseBody.description);
+          var responseBody: IMarkup = <IMarkup>JSON.parse(res.payload);
+          assert.equal(markup.name, responseBody.name);
+          assert.equal(markup.content, responseBody.content);
+          assert.equal(markup.postUrl, responseBody.postUrl);
+          assert.equal(apiKey,responseBody.partnerId);
           done();
         });
       });
     });
   });
 
-  it("Update task", (done) => {
+  it("Update markup", (done) => {
     var user = Utils.createUserDummy();
 
     server.inject({
@@ -119,25 +154,26 @@ describe("Tast Controller Tests", () => {
       assert.equal(200, res.statusCode);
       var login: any = JSON.parse(res.payload);
 
-      database.taskModel.findOne({}).then((task) => {
+      database.markupModel.findOne({}).then((markup) => {
 
-        var updateTask = {
-          completed: true,
-          name: task.name,
-          description: task.description
+        var updateMarkup = {
+          name: markup.name,
+          content: markup.content,
+          postUrl: markup.postUrl
         };
 
         server.inject({
             method: 'PUT',
-            url: '/tasks/' + task._id,
-            payload: updateTask,
+            url: '/markups/' + markup._id,
+            payload: updateMarkup,
             headers: {"authorization": login.token, "zincode-api-key": "abc"}
           },
           (res) => {
             assert.equal(200, res.statusCode);
             console.log(res.payload);
-            var responseBody: ITask = JSON.parse(res.payload);
-            assert.isTrue(responseBody.completed);
+            var responseBody: IMarkup = JSON.parse(res.payload);
+
+            assert.equal(updateMarkup.content, responseBody.content);
             done();
           });
       });
@@ -156,15 +192,15 @@ describe("Tast Controller Tests", () => {
       assert.equal(200, res.statusCode);
       var login: any = JSON.parse(res.payload);
 
-      database.taskModel.findOne({}).then((task) => {
+      database.markupModel.findOne({}).then((markup) => {
         server.inject({
           method: 'DELETE',
-          url: '/tasks/' + task._id,
+          url: '/markups/' + markup._id,
           headers: {"authorization": login.token, "zincode-api-key": "abc"}
         }, (res) => {
           assert.equal(200, res.statusCode);
-          var responseBody: ITask = JSON.parse(res.payload);
-          assert.equal(task.name, responseBody.name);
+          var responseBody: IMarkup = JSON.parse(res.payload);
+          assert.equal(markup.name, responseBody.name);
 
           database.taskModel.findById(responseBody._id).then((deletedTask) => {
             assert.isNull(deletedTask);
